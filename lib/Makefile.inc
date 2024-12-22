@@ -55,6 +55,7 @@ LIB_VTLS_CFILES =           \
   vtls/schannel.c           \
   vtls/schannel_verify.c    \
   vtls/sectransp.c          \
+  vtls/networkfmwk.c        \
   vtls/vtls.c               \
   vtls/wolfssl.c            \
   vtls/x509asn1.c

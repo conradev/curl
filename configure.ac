@@ -149,7 +149,7 @@ AC_SUBST(PKGADD_VENDOR)
 
 dnl
 dnl initialize all the info variables
-    curl_ssl_msg="no      (--with-{openssl,gnutls,mbedtls,wolfssl,schannel,secure-transport,amissl,bearssl,rustls} )"
+    curl_ssl_msg="no      (--with-{openssl,gnutls,mbedtls,wolfssl,schannel,secure-transport,network-framework,amissl,bearssl,rustls} )"
     curl_ssh_msg="no      (--with-{libssh,libssh2})"
    curl_zlib_msg="no      (--with-zlib)"
  curl_brotli_msg="no      (--with-brotli)"
@@ -223,6 +223,13 @@ AC_ARG_WITH(secure-transport,dnl
 AS_HELP_STRING([--with-secure-transport],[enable Apple OS native SSL/TLS]),[
   OPT_SECURETRANSPORT=$withval
   TLSCHOICE="${TLSCHOICE:+$TLSCHOICE, }Secure-Transport"
+])
+
+OPT_NETWORKFRAMEWORK=no
+AC_ARG_WITH(network-framework,dnl
+AS_HELP_STRING([--with-network-framework],[enable Apple Network.framework SSL/TLS]),[
+  OPT_NETWORKFRAMEWORK=$withval
+  TLSCHOICE="${TLSCHOICE:+$TLSCHOICE, }Network-Framework"
 ])
 
 OPT_AMISSL=no
@@ -422,6 +429,7 @@ Select from these:
   --with-rustls
   --with-schannel
   --with-secure-transport
+  --with-network-framework
   --with-wolfssl
 ])
   fi
@@ -2141,6 +2149,7 @@ esac
 
 CURL_WITH_SCHANNEL
 CURL_WITH_SECURETRANSPORT
+CURL_WITH_NETWORKFRAMEWORK
 CURL_WITH_AMISSL
 CURL_WITH_OPENSSL
 CURL_WITH_GNUTLS
@@ -2159,10 +2168,10 @@ if test "x$curl_cv_native_windows" = "xyes"; then
   LIBS="-lbcrypt $LIBS"
 fi
 
-case "x$SSL_DISABLED$OPENSSL_ENABLED$GNUTLS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$SCHANNEL_ENABLED$SECURETRANSPORT_ENABLED$BEARSSL_ENABLED$RUSTLS_ENABLED" in
+case "x$SSL_DISABLED$OPENSSL_ENABLED$GNUTLS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$SCHANNEL_ENABLED$SECURETRANSPORT_ENABLED$NETWORKFRAMEWORK_ENABLED$BEARSSL_ENABLED$RUSTLS_ENABLED" in
   x)
     AC_MSG_ERROR([TLS not detected, you will not be able to use HTTPS, FTPS, NTLM and more.
-Use --with-openssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-schannel, --with-secure-transport, --with-amissl, --with-bearssl or --with-rustls to address this.])
+Use --with-openssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-schannel, --with-secure-transport, --with-network-framework, --with-amissl, --with-bearssl or --with-rustls to address this.])
     ;;
   x1)
     # one SSL backend is enabled
@@ -2175,7 +2184,7 @@ Use --with-openssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-schann
     ;;
   xD*)
     AC_MSG_ERROR([--without-ssl has been set together with an explicit option to use an ssl library
-(e.g. --with-openssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-schannel, --with-secure-transport, --with-amissl, --with-bearssl, --with-rustls).
+(e.g. --with-openssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-schannel, --with-secure-transport, --with-network-framework, --with-amissl, --with-bearssl, --with-rustls).
 Since these are conflicting parameters, verify which is the desired one and drop the other.])
     ;;
   *)
@@ -5210,6 +5219,7 @@ if test "x$CURL_DISABLE_NTLM" != "x1"; then
   if test "x$OPENSSL_ENABLED" = "x1" -o "x$MBEDTLS_ENABLED" = "x1" \
       -o "x$GNUTLS_ENABLED" = "x1" \
       -o "x$SECURETRANSPORT_ENABLED" = "x1" \
+      -o "x$NETWORKFRAMEWORK_ENABLED" = "x1" \
       -o "x$USE_WIN32_CRYPTO" = "x1" \
       -o "x$WOLFSSL_NTLM" = "x1"; then
     use_curl_ntlm_core=yes
@@ -5248,6 +5258,7 @@ if test "x$CURL_DISABLE_HTTP" != "x1"; then
     if test "x$OPENSSL_ENABLED" = "x1" \
         -o "x$GNUTLS_ENABLED" = "x1" \
         -o "x$SECURETRANSPORT_ENABLED" = "x1" \
+        -o "x$NETWORKFRAMEWORK_ENABLED" = "x1" \
         -o "x$RUSTLS_ENABLED" = "x1" \
         -o "x$BEARSSL_ENABLED" = "x1" \
         -o "x$SCHANNEL_ENABLED" = "x1" \
